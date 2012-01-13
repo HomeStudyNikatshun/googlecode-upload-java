@@ -1,0 +1,9 @@
+java library/cli application to upload files to google code.
+
+usage: java -jar googlecode-upload.jar [OPTION]... FILE
+ -l,--labels <arg>     An optional list of comma-separated labels to
+                       attach to the file
+ -n,--project <arg>    Google Code project name
+ -p,--password <arg>   Your Google Code password
+ -s,--summary <arg>    Short description of the file
+ -u,--user <arg>       Your Google Code username
