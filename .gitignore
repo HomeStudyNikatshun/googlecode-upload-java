@@ -1,0 +1,15 @@
+build
+dist
+private
+release
+target
+*~
+*.bak*
+*.log
+*.bz2
+*.gz
+*.nbm
+.googlecode
+.passwd
+code.google
+one-jar
