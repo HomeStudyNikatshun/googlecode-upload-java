@@ -1,10 +1,10 @@
 package org.afraid.poison.googlecodeupload;
 
 import java.io.File;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.afraid.poison.common.CollectionUtil;
 
 /**
  *
@@ -37,7 +37,7 @@ public class FileDefinition {
 		this.file=file;
 		this.targetFileName=targetFileName;
 		this.summary=summary;
-		this.labels=new HashSet<String>(CollectionUtil.fromArray(labels));
+		this.labels=new LinkedHashSet<String>(Arrays.asList(labels));
 	}
 
 	public File getFile() {
@@ -54,6 +54,10 @@ public class FileDefinition {
 
 	public void setLabels(Set<String> labels) {
 		this.labels=labels;
+	}
+	
+	public void setLabels(String[] labels) {
+		setLabels(new LinkedHashSet<String>(Arrays.asList(labels)));
 	}
 
 	public String getSummary() {

@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.HashSet;
-import org.afraid.poison.common.CollectionUtil;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -35,7 +35,7 @@ public class App {
 				fileDefinition.setSummary(line.getOptionValue("s"));
 			}
 			if (line.hasOption("l") && null!=line.getOptionValue("l")) {
-				fileDefinition.setLabels(new HashSet<String>(CollectionUtil.fromArray(line.getOptionValue("l").split(","))));
+				fileDefinition.setLabels(new LinkedHashSet<String>(Arrays.asList(line.getOptionValue("l").split(","))));
 			}
 			project.upload(fileDefinition);
 		} catch (ParseException ex) {

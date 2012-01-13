@@ -151,7 +151,7 @@ public class Project {
 			}
 		}
 
-		log("Sending file: "+fileDefinition.getTargetFileName());
+		logger().log(Level.INFO, "Sending file: {0}", fileDefinition.getTargetFileName());
 		sendLine(out, "--"+BOUNDARY);
 		sendLine(out, "content-disposition: form-data; name=\"filename\"; filename=\""+fileDefinition.getTargetFileName()+"\"");
 		sendLine(out, "Content-Type: application/octet-stream");
