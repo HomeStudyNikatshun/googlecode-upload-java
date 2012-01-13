@@ -36,6 +36,8 @@ public class App {
 			}
 			if (line.hasOption("l") && null!=line.getOptionValue("l")) {
 				fileDefinition.setLabels(new LinkedHashSet<String>(Arrays.asList(line.getOptionValue("l").split(","))));
+			} else {
+				fileDefinition.setSummary(fileDefinition.getFile().getName());
 			}
 			project.upload(fileDefinition);
 		} catch (ParseException ex) {
@@ -46,8 +48,11 @@ public class App {
 
 	public static Options buildOptions() {
 		Option user=new Option("u", "user", true, "Your Google Code username");
+		user.setRequired(true);
 		Option password=new Option("p", "password", true, "Your Google Code password");
+		password.setRequired(true);
 		Option projectName=new Option("n", "project", true, "Google Code project name");
+		projectName.setRequired(true);
 		Option summary=new Option("s", "summary", true, "Short description of the file");
 		Option labels=new Option("l", "labels", true, "An optional list of comma-separated labels to attach to the file");
 
