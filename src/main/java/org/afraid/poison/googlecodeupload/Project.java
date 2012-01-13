@@ -28,17 +28,17 @@ public class Project {
 	private final static String GOOGLECODE=".googlecode.com";
 	private String userName;
 	private String password;
-	private String projectName;
+	private String name;
 	private boolean verbose=false;
 	private boolean ignoreSslCertificateHostname=false;
 
 	public Project() {
 	}
 
-	public Project(String userName, String password, String projectName) {
+	public Project(String userName, String password, String name) {
 		this.userName=userName;
 		this.password=password;
-		this.projectName=projectName;
+		this.name=name;
 	}
 
 	public boolean isIgnoreSslCertificateHostname() {
@@ -57,12 +57,12 @@ public class Project {
 		this.password=password;
 	}
 
-	public String getProjectName() {
-		return projectName;
+	public String getName() {
+		return name;
 	}
 
-	public void setProjectName(String projectName) {
-		this.projectName=projectName;
+	public void setName(String name) {
+		this.name=name;
 	}
 
 	public String getUserName() {
@@ -183,10 +183,10 @@ public class Project {
 	}
 
 	private URL createUploadURL() throws MalformedURLException {
-		if (getProjectName()==null) {
+		if (getName()==null) {
 			throw new NullPointerException("projectName required");
 		}
-		return new URL("https", getProjectName()+GOOGLECODE, "/files");
+		return new URL("https", getName()+GOOGLECODE, "/files");
 	}
 
 	@Override
@@ -204,7 +204,7 @@ public class Project {
 		if ((this.password==null) ? (other.password!=null) : !this.password.equals(other.password)) {
 			return false;
 		}
-		if ((this.projectName==null) ? (other.projectName!=null) : !this.projectName.equals(other.projectName)) {
+		if ((this.name==null) ? (other.name!=null) : !this.name.equals(other.name)) {
 			return false;
 		}
 		return true;
@@ -215,7 +215,7 @@ public class Project {
 		int hash=7;
 		hash=67*hash+(this.userName!=null ? this.userName.hashCode() : 0);
 		hash=67*hash+(this.password!=null ? this.password.hashCode() : 0);
-		hash=67*hash+(this.projectName!=null ? this.projectName.hashCode() : 0);
+		hash=67*hash+(this.name!=null ? this.name.hashCode() : 0);
 		return hash;
 	}
 }
