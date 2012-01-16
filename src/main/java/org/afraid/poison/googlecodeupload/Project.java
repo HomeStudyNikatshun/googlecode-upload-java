@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.http.HttpEntity;
@@ -119,14 +120,10 @@ public class Project {
 			}
 
 			httppost.setEntity(reqEntity);
-			System.out.println("executing request "+httppost.getRequestLine());
+			logger().log(Level.INFO, "executing request {0}", httppost.getRequestLine());
 			HttpResponse response=httpclient.execute(targetHost, httppost, localcontext);
 			HttpEntity resEntity=response.getEntity();
-			System.out.println("----------------------------------------");
-			System.out.println(response.getStatusLine());
-			if (null!=resEntity) {
-				System.out.println("Response content length: "+resEntity.getContentLength());
-			}
+			logger().info(response.getStatusLine().toString());
 			EntityUtils.consume(resEntity);
 		} finally {
 			try {
@@ -138,7 +135,7 @@ public class Project {
 
 	private URL createUploadURL() throws MalformedURLException {
 		if (getName()==null) {
-			throw new NullPointerException("projectName required");
+			throw new NullPointerException("name required");
 		}
 		return new URL("https", getName()+GOOGLECODE, "/files");
 	}
