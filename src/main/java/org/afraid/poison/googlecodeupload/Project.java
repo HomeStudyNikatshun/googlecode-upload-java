@@ -8,14 +8,20 @@ import java.net.URL;
 import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 
 /**
@@ -86,22 +92,25 @@ public class Project {
 	}
 
 	public void upload(FileDefinition fileDefinition) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException, IOException {
+		URL googlecodeUrl=createUploadURL();
+		HttpHost targetHost=new HttpHost(googlecodeUrl.getHost(), googlecodeUrl.getDefaultPort(), googlecodeUrl.getProtocol());
 		DefaultHttpClient httpclient=new DefaultHttpClient();
 		try {
-			URL googlecodeUrl=createUploadURL();
-			
 			httpclient.getCredentialsProvider().setCredentials(
-					new AuthScope(googlecodeUrl.getHost(), 443),
+					new AuthScope(targetHost.getHostName(), targetHost.getPort()),
 					new UsernamePasswordCredentials(getUserName(), getPassword()));
-			HttpPost httppost=new HttpPost(googlecodeUrl.toURI());
+			AuthCache authCache=new BasicAuthCache();
+			BasicScheme basicAuth=new BasicScheme();
+			authCache.put(targetHost, basicAuth);
+			BasicHttpContext localcontext=new BasicHttpContext();
+			localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
 
+			HttpPost httppost=new HttpPost(googlecodeUrl.toURI());
 			MultipartEntity reqEntity=new MultipartEntity();
-			FileBody bin=new FileBody(fileDefinition.getFile());
-			reqEntity.addPart("bin", bin);
+			FileBody bin=new FileBody(fileDefinition.getFile(), fileDefinition.getTargetFileName(), "application/octet-stream", null);
+			reqEntity.addPart("file", bin);
 			StringBody summary=new StringBody(fileDefinition.getSummary());
 			reqEntity.addPart("summary", summary);
-			StringBody fileName=new StringBody(fileDefinition.getTargetFileName());
-			reqEntity.addPart("filename", fileName);
 			if (fileDefinition.getLabels()!=null&&!fileDefinition.getLabels().isEmpty()) {
 				for (String label : fileDefinition.getLabels()) {
 					StringBody lBody=new StringBody(label);
@@ -110,9 +119,8 @@ public class Project {
 			}
 
 			httppost.setEntity(reqEntity);
-
 			System.out.println("executing request "+httppost.getRequestLine());
-			HttpResponse response=httpclient.execute(httppost);
+			HttpResponse response=httpclient.execute(targetHost, httppost, localcontext);
 			HttpEntity resEntity=response.getEntity();
 			System.out.println("----------------------------------------");
 			System.out.println(response.getStatusLine());
