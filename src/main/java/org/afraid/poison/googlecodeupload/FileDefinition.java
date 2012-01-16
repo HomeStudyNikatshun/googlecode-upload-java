@@ -27,17 +27,15 @@ public class FileDefinition {
 	}
 
 	public FileDefinition(File file, String targetFileName, String summary, Set<String> labels) {
-		this.file=file;
+		this(file, summary);
 		this.targetFileName=targetFileName;
-		this.summary=summary;
-		this.labels=labels;
+		setLabels(labels);
 	}
 	
 	public FileDefinition(File file, String targetFileName, String summary, String[] labels) {
-		this.file=file;
+		this(file, summary);
 		this.targetFileName=targetFileName;
-		this.summary=summary;
-		this.labels=new LinkedHashSet<String>(Arrays.asList(labels));
+		setLabels(labels);
 	}
 
 	public File getFile() {
