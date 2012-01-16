@@ -3,7 +3,9 @@ package org.afraid.poison.googlecodeupload;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import org.apache.commons.cli.CommandLine;
@@ -16,7 +18,7 @@ import org.apache.commons.cli.PosixParser;
 
 public class App {
 
-	public static void main(String[] args) throws MalformedURLException, FileNotFoundException, IOException {
+	public static void main(String[] args) throws MalformedURLException, FileNotFoundException, IOException, UnsupportedEncodingException, URISyntaxException {
 		try {
 			CommandLineParser parser=new PosixParser();
 			Options options=buildOptions();

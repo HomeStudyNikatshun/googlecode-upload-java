@@ -1,22 +1,22 @@
 package org.afraid.poison.googlecodeupload;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 
 /**
  *
@@ -85,97 +85,47 @@ public class Project {
 		return Logger.getLogger("googlecode-upload");
 	}
 
-	private static void sendLine(OutputStream out, String string) throws IOException {
-		out.write(string.getBytes("ascii"));
-		out.write("\r\n".getBytes("ascii"));
-	}
+	public void upload(FileDefinition fileDefinition) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException, IOException {
+		DefaultHttpClient httpclient=new DefaultHttpClient();
+		try {
+			URL googlecodeUrl=createUploadURL();
+			
+			httpclient.getCredentialsProvider().setCredentials(
+					new AuthScope(googlecodeUrl.getHost(), 443),
+					new UsernamePasswordCredentials(getUserName(), getPassword()));
+			HttpPost httppost=new HttpPost(googlecodeUrl.toURI());
 
-	private String createAuthToken() throws UnsupportedEncodingException {
-		String tokenString=getUserName()+":"+getPassword();
-		return Base64.encodeBase64URLSafeString(tokenString.getBytes("UTF-8"));
-	}
+			MultipartEntity reqEntity=new MultipartEntity();
+			FileBody bin=new FileBody(fileDefinition.getFile());
+			reqEntity.addPart("bin", bin);
+			StringBody summary=new StringBody(fileDefinition.getSummary());
+			reqEntity.addPart("summary", summary);
+			StringBody fileName=new StringBody(fileDefinition.getTargetFileName());
+			reqEntity.addPart("filename", fileName);
+			if (fileDefinition.getLabels()!=null&&!fileDefinition.getLabels().isEmpty()) {
+				for (String label : fileDefinition.getLabels()) {
+					StringBody lBody=new StringBody(label);
+					reqEntity.addPart("label", lBody);
+				}
+			}
 
-	public void upload(FileDefinition fileDefinition) throws MalformedURLException, FileNotFoundException, IOException {
-		System.clearProperty("javax.net.ssl.trustStoreType");
-		System.clearProperty("javax.net.ssl.trustStoreProvider");
+			httppost.setEntity(reqEntity);
 
-		final String BOUNDARY="IMustSayIHaveToSetSomeBoundariesHere___";
-		URL url=createUploadURL();
-		logger().log(Level.INFO, "upload URL: {0}", url);
-
-		InputStream in=new BufferedInputStream(new FileInputStream(fileDefinition.getFile()));
-
-		HttpURLConnection conn=(HttpURLConnection) url.openConnection();
-		if (this.isIgnoreSslCertificateHostname()) {
-			if (conn instanceof HttpsURLConnection) {
-				HttpsURLConnection secure=(HttpsURLConnection) conn;
-				secure.setHostnameVerifier(new HostnameVerifier() {
-
-					@Override
-					public boolean verify(String hostname, SSLSession session) {
-						boolean result=true;
-						logger().info("ignoring SSL verification");
-						return result;
-					}
-				});
+			System.out.println("executing request "+httppost.getRequestLine());
+			HttpResponse response=httpclient.execute(httppost);
+			HttpEntity resEntity=response.getEntity();
+			System.out.println("----------------------------------------");
+			System.out.println(response.getStatusLine());
+			if (null!=resEntity) {
+				System.out.println("Response content length: "+resEntity.getContentLength());
+			}
+			EntityUtils.consume(resEntity);
+		} finally {
+			try {
+				httpclient.getConnectionManager().shutdown();
+			} catch (Exception ignore) {
 			}
 		}
-
-		conn.setDoOutput(true);
-		conn.setRequestProperty("Authorization", "Basic "+createAuthToken());
-		conn.setRequestProperty("Content-Type", "multipart/form-data; boundary="+BOUNDARY);
-		conn.setRequestProperty("User-Agent", "org.afraid.poison.googlecode-upload");
-
-		logger().log(Level.INFO, "Connecting (username: {0})", userName);
-		conn.connect();
-
-		logger().info("Sending request parameters");
-		OutputStream out=conn.getOutputStream();
-		sendLine(out, "--"+BOUNDARY);
-		sendLine(out, "content-disposition: form-data; name=\"summary\"");
-		sendLine(out, "");
-		sendLine(out, fileDefinition.getSummary());
-
-		if (fileDefinition.getLabels()!=null&&!fileDefinition.getLabels().isEmpty()) {
-			logger().log(Level.INFO, "Setting labels: {0}", fileDefinition.getLabels());
-
-			for (String label : fileDefinition.getLabels()) {
-				sendLine(out, "--"+BOUNDARY);
-				sendLine(out, "content-disposition: form-data; name=\"label\"");
-				sendLine(out, "");
-				sendLine(out, label.trim());
-			}
-		}
-
-		logger().log(Level.INFO, "Sending file: {0}", fileDefinition.getTargetFileName());
-		sendLine(out, "--"+BOUNDARY);
-		sendLine(out, "content-disposition: form-data; name=\"filename\"; filename=\""+fileDefinition.getTargetFileName()+"\"");
-		sendLine(out, "Content-Type: application/octet-stream");
-		sendLine(out, "");
-		int count;
-		byte[] buf=new byte[16384];
-		while ((count=in.read(buf))>=0) {
-			out.write(buf, 0, count);
-		}
-		in.close();
-		sendLine(out, "");
-		sendLine(out, "--"+BOUNDARY+"--");
-
-		out.flush();
-		out.close();
-		in=conn.getInputStream();
-
-		logger().info("upload finished");
-
-		logger().log(Level.INFO, "HTTP Response Headers: {0}", conn.getHeaderFields());
-		StringBuilder responseBody=new StringBuilder();
-		while ((count=in.read(buf))>=0) {
-			responseBody.append(new String(buf, 0, count, "ascii"));
-		}
-		logger().info(responseBody.toString());
-		in.close();
-
-		conn.disconnect();
 	}
 
 	private URL createUploadURL() throws MalformedURLException {
