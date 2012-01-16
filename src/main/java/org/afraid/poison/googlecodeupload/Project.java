@@ -112,13 +112,17 @@ public class Project {
 			reqEntity.addPart("file", bin);
 			StringBody summary=new StringBody(fileDefinition.getSummary());
 			reqEntity.addPart("summary", summary);
+			if (null!=fileDefinition.getDescription()) {
+				StringBody description=new StringBody(fileDefinition.getDescription());
+				reqEntity.addPart("description", description);
+			}
 			if (fileDefinition.getLabels()!=null&&!fileDefinition.getLabels().isEmpty()) {
 				for (String label : fileDefinition.getLabels()) {
 					StringBody lBody=new StringBody(label);
 					reqEntity.addPart("label", lBody);
 				}
 			}
-
+			
 			httppost.setEntity(reqEntity);
 			logger().log(Level.INFO, "executing request {0}", httppost.getRequestLine());
 			HttpResponse response=httpclient.execute(targetHost, httppost, localcontext);

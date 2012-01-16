@@ -16,6 +16,7 @@ public class FileDefinition {
 	private File file;
 	private String targetFileName;
 	private String summary;
+	private String description;
 	private Set<String> labels;
 
 	public FileDefinition() {
@@ -31,7 +32,7 @@ public class FileDefinition {
 		this.targetFileName=targetFileName;
 		setLabels(labels);
 	}
-	
+
 	public FileDefinition(File file, String targetFileName, String summary, String[] labels) {
 		this(file, summary);
 		this.targetFileName=targetFileName;
@@ -46,16 +47,15 @@ public class FileDefinition {
 		this.file=file;
 	}
 
-	public Set<String> getLabels() {
-		return labels;
+	public String getTargetFileName() {
+		if (null==targetFileName) {
+			return getFile().getName();
+		}
+		return targetFileName;
 	}
 
-	public void setLabels(Set<String> labels) {
-		this.labels=labels;
-	}
-	
-	public void setLabels(String[] labels) {
-		setLabels(new LinkedHashSet<String>(Arrays.asList(labels)));
+	public void setTargetFileName(String targetFileName) {
+		this.targetFileName=targetFileName;
 	}
 
 	public String getSummary() {
@@ -66,14 +66,23 @@ public class FileDefinition {
 		this.summary=summary;
 	}
 
-	public String getTargetFileName() {
-		if (null==targetFileName) {
-			return getFile().getName();
-		}
-		return targetFileName;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setTargetFileName(String targetFileName) {
-		this.targetFileName=targetFileName;
+	public void setDescription(String description) {
+		this.description=description;
+	}
+
+	public Set<String> getLabels() {
+		return labels;
+	}
+
+	public void setLabels(Set<String> labels) {
+		this.labels=labels;
+	}
+
+	public void setLabels(String[] labels) {
+		setLabels(new LinkedHashSet<String>(Arrays.asList(labels)));
 	}
 }

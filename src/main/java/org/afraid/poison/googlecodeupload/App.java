@@ -44,6 +44,9 @@ public class App {
 			if (line.hasOption("filename") && null!=line.getOptionValue("filename")) {
 				fileDefinition.setTargetFileName(line.getOptionValue("filename"));
 			}
+			if (line.hasOption("description") && null!=line.getOptionValue("description")) {
+				fileDefinition.setDescription(line.getOptionValue("description"));
+			}
 			project.upload(fileDefinition);
 		} catch (ParseException ex) {
 			System.err.println(ex);
@@ -61,6 +64,7 @@ public class App {
 		Option summary=new Option("s", "summary", true, "Short description of the file");
 		Option labels=new Option("l", "labels", true, "An optional list of comma-separated labels to attach to the file");
 		Option targetFileName=new Option(null, "filename", true, "optional filename");
+		Option description=new Option("d", "description", true, "optional description");
 
 		Options options=new Options();
 		options.addOption(user);
@@ -69,6 +73,7 @@ public class App {
 		options.addOption(summary);
 		options.addOption(labels);
 		options.addOption(targetFileName);
+		options.addOption(description);
 		return options;
 	}
 
