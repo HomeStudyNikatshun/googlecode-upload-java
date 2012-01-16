@@ -5,7 +5,7 @@
 
 	<groupId>org.afraid.poison</groupId>
 	<artifactId>googlecode-upload</artifactId>
-	<version>1.1</version>
+	<version>1.2</version>
 	<packaging>jar</packaging>
 
 	<name>googlecode-upload</name>
