@@ -81,10 +81,6 @@ public class Project {
 		this.verbose=verbose;
 	}
 
-	private static void log(String msg) {
-		System.err.println(msg);
-	}
-
 	private static Logger logger() {
 		return Logger.getLogger("googlecode-upload");
 	}
@@ -176,7 +172,7 @@ public class Project {
 		while ((count=in.read(buf))>=0) {
 			responseBody.append(new String(buf, 0, count, "ascii"));
 		}
-		log(responseBody.toString());
+		logger().info(responseBody.toString());
 		in.close();
 
 		conn.disconnect();
