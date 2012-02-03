@@ -9,7 +9,29 @@
 	<packaging>jar</packaging>
 
 	<name>googlecode-upload</name>
-	<url>http://maven.apache.org</url>
+	<description>
+		java library/cli application to upload files to google code
+	</description>
+	<url>http://code.google.com/p/googlecode-upload-java/</url>
+	<developers>
+		<developer>
+			<name>Andreas Schnaiter</name>
+			<email>rc.poison@gmail.com</email>
+		</developer>
+	</developers>
+	<licenses>
+		<license>
+			<name>DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE Version 2</name>
+			<url>http://sam.zoy.org/wtfpl/COPYING</url>
+		</license>
+	</licenses>
+	<scm>
+		<connection>scm:git:https://code.google.com/p/googlecode-upload-java/</connection>
+		<url>http://code.google.com/p/googlecode-upload-java/source/browse/</url>
+	</scm>
+	<issueManagement>
+		<url>http://code.google.com/p/googlecode-upload-java/issues/list</url>
+	</issueManagement>
 	<build>
 		<plugins>
 			<plugin>
