@@ -122,18 +122,16 @@ public class Project {
 					reqEntity.addPart("label", lBody);
 				}
 			}
-			
-			httppost.setEntity(reqEntity);
+			System.err.println(reqEntity.getContentLength() + " bytes total");
+			ProgressHttpEntity countingHttpEntity=new ProgressHttpEntity(reqEntity, new ProgressListenerCLI(reqEntity.getContentLength()));
+			httppost.setEntity(countingHttpEntity);
 			logger().log(Level.INFO, "executing request {0}", httppost.getRequestLine());
 			HttpResponse response=httpclient.execute(targetHost, httppost, localcontext);
 			HttpEntity resEntity=response.getEntity();
 			logger().info(response.getStatusLine().toString());
 			EntityUtils.consume(resEntity);
 		} finally {
-			try {
-				httpclient.getConnectionManager().shutdown();
-			} catch (Exception ignore) {
-			}
+			httpclient.getConnectionManager().shutdown();
 		}
 	}
 
