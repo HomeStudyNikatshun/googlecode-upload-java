@@ -49,7 +49,7 @@ public class App {
 			}
 			project.upload(fileDefinition);
 		} catch (ParseException ex) {
-			System.err.println(ex);
+			System.err.println(ex.getMessage());
 			printHelp();
 		}
 	}
